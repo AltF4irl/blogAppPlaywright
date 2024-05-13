@@ -1,27 +1,27 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginHelper } = require('./helper')
+const { loginHelper, createBlog } = require('./helper')
 
 describe('Blog app', () => {
-  beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:3003/api/testing/reset')
-    await request.post('http://localhost:3003/api/users', {
-      data: {
-        name: 'assil',
-        username: 'altf4irl69',
-        password: '692514'
-      }
+    beforeEach(async ({ page, request }) => {
+        await request.post('http://localhost:3003/api/testing/reset')
+        await request.post('http://localhost:3003/api/users', {
+        data: {
+            name: 'assil',
+            username: 'altf4irl69',
+            password: '692514'
+        }
+        })
+        await page.goto('http://localhost:5174')
     })
-    await page.goto('http://localhost:5174')
-  })
 
-  test('Login form is shown', async ({ page }) => {
-    await expect(page.getByText('Log in to App')).toBeVisible()
-    await expect(page.getByTestId('username')).toBeVisible()
-    await expect(page.getByTestId('password')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible()
-  })
+    test('Login form is shown', async ({ page }) => {
+        await expect(page.getByText('Log in to App')).toBeVisible()
+        await expect(page.getByTestId('username')).toBeVisible()
+        await expect(page.getByTestId('password')).toBeVisible()
+        await expect(page.getByRole('button', { name: 'Login' })).toBeVisible()
+    })
 
-  describe('Login', () => {
+    describe('Login', () => {
         test('succeeds with correct credentials', async ({ page }) => {
             await loginHelper(page, 'altf4irl69', '692514')
             await expect(page.getByText('Blogs')).toBeVisible()
@@ -32,6 +32,17 @@ describe('Blog app', () => {
         test('fails with wrong credentials', async ({ page }) => {
             await loginHelper(page, 'altf4irl69', 'nihjdh')
             await expect(page.locator('.error')).toContainText('Wrong Username or Password')
+        })
+    })
+
+    describe('When logged in', () => {
+        beforeEach(async ({ page }) => {
+          await loginHelper(page, 'altf4irl69', '692514')
+        })
+      
+        test('a new blog can be created', async ({ page }) => {
+          await createBlog(page, "cc", "cc", "cc")
+          await expect(page.getByTestId('blogheader')).toHaveText("cc | cc")
         })
     })
 })
