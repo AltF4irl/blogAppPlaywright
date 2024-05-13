@@ -44,5 +44,17 @@ describe('Blog app', () => {
           await createBlog(page, "cc", "cc", "cc")
           await expect(page.getByTestId('blogheader')).toHaveText("cc | cc")
         })
+
+        describe('when a blog is created', () => {
+            beforeEach(async ({ page }) => {
+                await createBlog(page, "autrhor", "title", "url")
+            })
+
+            test('likes are editable', async ({ page }) => {
+                await page.getByRole('button', { name: "view" }).click()
+                await page.getByRole('button', { name: "Like" }).click()
+                await expect(page.getByText('1')).toBeVisible()
+            })
+        })
     })
 })
