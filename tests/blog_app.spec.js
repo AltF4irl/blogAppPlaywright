@@ -63,6 +63,31 @@ describe('Blog app', () => {
 
             })
 
+            test('when adding more than a blog, blogs should be sorted by likes', async ({ page }) => {
+                await createBlog(page, "cc", "cc", "cc")
+
+                await page.getByRole('button', {name: 'view'}).first().click()
+                // // await viewButtons[0].click()
+                // page.getByRole('button', {name: 'view'}).nth(0)
+                // // await viewButtons[1].click()
+                // // await viewButtons[2].click()
+                await page.getByRole('button', {name: 'view'}).last().click()
+
+                const likeButtons = await page.getByRole('button', {name: 'Like'}).all()
+                await likeButtons[0].click()
+                await likeButtons[1].click()
+                await likeButtons[1].click()
+                await likeButtons[1].click()
+
+                await page.reload()
+
+                await page.getByRole('button', {name: 'view'}).first().click()
+                await page.getByRole('button', {name: 'view'}).last().click()
+                
+                await expect( page.locator('.likes').first().textContent() >= page.locator('.likes').last().textContent()).toBeTruthy()
+
+            })
+
             test('login with another user, the blog should not be deleted', async ({ page, request }) => {
                 await request.post('http://localhost:3003/api/users', {
                     data: {
