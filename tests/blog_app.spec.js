@@ -11,7 +11,7 @@ describe('Blog app', () => {
             password: '692514'
         }
         })
-        await page.goto('http://localhost:5174')
+        await page.goto('http://localhost:5173')
     })
 
     test('Login form is shown', async ({ page }) => {
@@ -54,6 +54,22 @@ describe('Blog app', () => {
                 await page.getByRole('button', { name: "view" }).click()
                 await page.getByRole('button', { name: "Like" }).click()
                 await expect(page.getByText('1')).toBeVisible()
+            })
+
+
+            test('login with another user, the blog should not be deleted', async ({ page, request }) => {
+                await request.post('http://localhost:3003/api/users', {
+                    data: {
+                        name: 'jaby',
+                        username: 'altf4irl',
+                        password: '140614'
+                    }
+                })
+
+                await page.getByRole('button', { name: "Logout" }).click()
+                await loginHelper(page, 'altf4irl', '140614')
+                await page.getByRole('button', { name: "view" }).click()
+                await expect(page.getByRole('button', { name: 'Remove' })).not.toBeVisible()
             })
         })
     })
