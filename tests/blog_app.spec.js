@@ -56,6 +56,12 @@ describe('Blog app', () => {
                 await expect(page.getByText('1')).toBeVisible()
             })
 
+            test('user who added blog can delete it', async ({ page }) => {
+                await page.getByRole('button', { name: "view" }).click()
+                await page.getByRole('button', { name: "remove" }).click()
+                await expect(page.getByText('Blog Deleted Successfully')).toBeVisible()
+
+            })
 
             test('login with another user, the blog should not be deleted', async ({ page, request }) => {
                 await request.post('http://localhost:3003/api/users', {
